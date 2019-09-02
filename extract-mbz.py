@@ -266,7 +266,12 @@ html_index_page = io.StringIO()
 html_index_page.write(start_of_html)
 html_index_page.write("<h2 class=''>%s</h2><h4 class=''>%s</h4>" % (fullname, shortname))
 
-
+html_header = '''
+<head>
+	<title>Moodle Backup Extract</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="tachyons.css">
+</head>'''
 
 ##########################
 # Process each section
@@ -370,7 +375,7 @@ for s in backupTree.findall("./information/contents/sections")[0].findall("secti
             page_xml_file = activities.find(item_xpath).find("directory").text
 
             # Open page file
-            page_xml = get_mbz_content(mbz, 'activities/url_%s/url.xml' % item)
+            page_xml = get_mbz_content(mbz, 'activities/page_%s/page.xml' % item)
             page_tree = etree.fromstring(page_xml)
             page_content = page_tree.find("page/content").text
 
@@ -387,7 +392,7 @@ for s in backupTree.findall("./information/contents/sections")[0].findall("secti
                 pagefile.write("<h1>%s</h1>" % page_title)
                 pagefile.write(page_content)
 
-                zf.write(pageFilePath, pagefile.getvalue())
+                zf.writestr(pageFilePath, pagefile.getvalue())
 
             page_url = "./section_%03d/%s" % (itemCount, pageFilename)
             item_title = "<a href='%s'>%s</a>" % (page_url, page_title)
@@ -422,7 +427,7 @@ for s in backupTree.findall("./information/contents/sections")[0].findall("secti
                     destination_in_zip = add_unique_postfix(zf, "%s/%s" % (section_file_dir, filename))
                     filepath_in_mbz = os.path.join("files", contenthash[:2], contenthash)
      
-                    zf.write(destination_in_zip , get_mbz_content(mbz, filepath_in_mbz))
+                    zf.writestr(destination_in_zip , get_mbz_content(mbz, filepath_in_mbz))
 
                     file_url = "./section_%03d/%s" % (itemCount, filename)
                     folder_html += "<li><a href='%s'>%s</a></li>" % (file_url, original_filename)
